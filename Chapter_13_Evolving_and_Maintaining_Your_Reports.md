@@ -1,0 +1,467 @@
+# 13 Evolving and Maintaining Your Reports
+
+Source: *Financial Modeling and Reporting with Microsoft Power BI* (Packt Publishing, 2026)
+DOI: 10.0000/PACKT_FMRWPB_2026  |  GitHub: https://github.com/PacktPublishing/Financial-Modeling-with-Power-BI_Packt/tree/main/Chapter13
+Page range: 320 - 337
+
+## Introduction
+
+Having built our reports, we will now turn our attention to sharing reports with our users and managing those reports over the long term.
+
+Throughout this book, we've worked in Power BI Desktop, which is the developer environment for Power BI. As this is a file-based application, it's not ideal for sharing reports with users. Emailing PBIX files to users will result in version issues and duplication. We've all been there with Excel and other files that have been distributed via email, where everyone is confused about which version is the latest.
+
+So, it's important to have robust practices to secure and share your reports, ensuring the right users have the right reports in a secure manner. This chapter will cover that.
+
+Beyond that, we need to consider how to keep the data current. If the data becomes old, the report will have limited use. This should be automatic, to minimize the manual handling of data and the possibility of data refresh being forgotten or being missed because the person responsible for it is off work.
+
+The next step in the life cycle of a report is to make provision for change. Organizations evolve over time, and unless the reporting suite also evolves, it will quickly become out of date and fall out of use. There needs to be consideration of how new requirements are captured, validated, and implemented.
+
+The final step is to retire old reports. This requires a process of identifying reports that are no longer used, identifying candidates for deletion, and deleting them from the Power BI tenant.
+
+By the end of this chapter, you will understand the following:
+
+- The core features of the administration portal
+- The importance of life cycle management
+- The basic principles of security
+- How to ensure that data is kept up to date in published reports
+
+There's a lot of important information to cover in this chapter, so please grab a drink, sit back, and take it all in.
+
+## 13.1 User access and publishing to the web
+
+To make our reports useful, we have to make them available to our users. We will start by looking at how to get everything set up.
+
+### 13.1.1 Admin portal and publishing to the web
+
+In this section, we discuss one of the most important settings in the Fabric admin portal for security. Please note that the admin portal for Power BI is also called the Fabric admin portal and is an important component of Power BI to be aware of. As an aside, we recommend working through the settings to check what may be enabled by default, as there may be some settings that you want to change.
+
+The first step toward securing organizational data is to identify and classify the data being managed. Consideration should be given to who the intended audience is and the consequences if the data is lost or transmitted to unauthorized people inside or outside of the organization. Data leaks are very serious and happen more frequently than you may think.
+
+For the most part, when dealing with purely financial data, the risk will be commercial. If, however, there is personally identifying data, additional consideration should be given to securing this data, as there are likely more stringent regulations with regard to personal data than commercial data.
+
+It's important to note that there are no failsafe methods to prevent data loss. You can't guarantee that there won't be a malicious actor within an organization, or, as is more likely, human error, which causes data leakage.
+
+One key setting to check for the organization is whether or not the **Publish to web** function is enabled in the admin portal. When this feature is enabled, users can publish reports openly to anyone on the internet.
+
+While this can be useful for publishing information from an organization into the public domain, if used incorrectly, it can expose confidential data to anyone with the correct link.
+
+The admin portal can be found by selecting the cog wheel icon in Power BI (or Fabric), which is in the top right of the screen:
+
+![Figure 13.1 - The Fabric admin portal](ch_assets/page_322.png)
+
+```
+   Power BI / Fabric - Admin portal (settings cog)
+
+   +-------- Power BI (top bar) ----------------------------+
+   |  [Home] [Favorites] [Recent] [Apps] ...        [cog] |   <-- click
+   +----------------------------------------------------------+
+                                            |
+                                            v
+   +----- Admin portal ---------------------------+
+   |  Tenant settings                            |
+   |    - Publish to web                         |
+   |    - Export reports / download              |
+   |    - Embed codes                            |
+   |    - Service usage metrics                  |
+   |    - Audit and usage logs                   |
+   |    ...                                      |
+   +---------------------------------------------+
+   Warning: review defaults - some may be ON when
+   you actually want them OFF (security)
+```
+
+Here, admin users can access organization-wide settings - a number of which are useful for preventing the download and sharing of data, such as the following:
+
+- **Publish to Web** (this should always be disabled unless there is a need for it)
+- **Download to CSV**
+- **Download to Excel**
+- **Download report**
+
+Restricting these can reduce the risk of data loss, since it makes it harder to extract data from a report and then send it out via email or save it to a USB drive. Conversely, restricting these can make the reporting suite less flexible and frustrate users, who may start creating their own ways around it, such as building reports in Excel. There are always trade-offs with decisions around security.
+
+The Fabric admin portal has a comprehensive list of settings that we recommend you review and assess how they affect your organization in terms of security and daily usage.
+
+Next, we will explain workspaces in the Power BI service and how they can be set up to help manage your reports.
+
+### 13.1.2 Workspaces
+
+Workspaces behave similarly to folders on a computer, storing reports and associated objects such as the data model. When a report is published from Power BI Desktop, there are two components loaded to a workspace: the data model and the report. Please note that a workspace cannot store other information, such as Excel files or Word documents; it's solely for Power BI objects.
+
+You create workspaces within the Power BI service, and it's important to select the type of workspace; this will control the license required for accessing the workspace. The options available for the type of workspace will depend on the licenses owned by your organization and the licenses currently available from Microsoft, but this will typically include options such as **Pro** or **Fabric Capacity**.
+
+Whichever license mode is assigned, it will determine which license the user will require when accessing the reports within that workspace:
+
+![Figure 13.2 - Applying a licence to a workspace](ch_assets/page_324.png)
+
+```
+   Workspace settings - License mode drop-down
+
+   +------ Workspace: Financial Reporting ---------+
+   |  License mode :  [ Pro                 v ]     |
+   |------------------------------------------------|
+   |  Options:                                      |
+   |    [ Pro ]          - 600mm query cache         |
+   |    [ Premium per user ]                        |
+   |    [ Fabric capacity ]                         |
+   |------------------------------------------------|
+   |  [ Save ]   [ Cancel ]                         |
+   +------------------------------------------------+
+   Note: license mode controls which users can
+   access this workspace and the report features.
+```
+
+Once a workspace has been created, it can be shared with other users:
+
+![Figure 13.3 - Adding users to a workspace](ch_assets/page_325.png)
+
+```
+   Workspace - Add people / Manage access panel
+
+   +--- Manage access -------------------------------+
+   |                                                 |
+   |  Add people, groups or apps:                    |
+   |  [ jane@contoso.com                       v ]   |
+   |  Permission:  [ Viewer         v ]              |
+   |  [ Add ]                                        |
+   |-------------------------------------------------|
+   |  Current members:                               |
+   |    jane@contoso.com          Viewer            |
+   |    finance-team             Contributor         |
+   |    sarah@contoso.com        Member              |
+   |    alex@contoso.com         Admin               |
+   |                                                 |
+   +-------------------------------------------------+
+```
+
+Controlling access to data and reports via workspace permissions is one method to manage security for Power BI. In granting access to the workspace, you grant access to the reports and the data contained within that workspace. There are a number of access levels that can be applied:
+
+- **Viewer**: Can view the reports and data, but cannot modify or create new reports
+- **Contributor**: Can view reports and data, and can create new reports based on data stored in the workspace
+- **Member**: Can do all that a contributor can, but can also control some permissions and update apps
+- **Admin**: Has full control over the workspace, including deleting the workspace
+
+Most users will typically be viewers or contributors, with only a few admins or members.
+
+The downside of securing data only in workspaces, however, is that it is a very blunt tool; either the user sees everything in the report or they see nothing. Sometimes a more nuanced approach is required, and that calls for row-level security, which we discuss later in this chapter.
+
+Now that individuals can access the workspace, we need to consider the processes of publishing reports to the workspace.
+
+### 13.1.3 Publishing reports
+
+Now that we have our workspaces with the correct security established, we can publish reports to them.
+
+#### 13.1.3.1 From Power BI Desktop
+
+From Power BI Desktop, it's a straightforward process: the user must ensure they have logged in to the service from Power BI Desktop, and then select the **Publish** button in the home ribbon bar. This will launch a new window, where the user is presented with the workspaces that they have access to, and they can then select and publish the report. It's a straightforward process to publish a report to a Power BI service workspace from Power BI Desktop.
+
+#### 13.1.3.2 Within the service
+
+You can directly import semantic models and paginated reports from within the Power BI service using the **Import** button within a workspace. This is less commonly used than publishing from Power BI Desktop, but the capability exists.
+
+### 13.1.4 Workspace planning
+
+You have many choices when planning your workspaces, and it's easy for workspaces, like computer folders, to get out of control. We recommend limiting the number of people creating workspaces to maintain control, as well as planning workspaces with specific purposes.
+
+A common deployment method is to create workspaces based on typical software development practices, using a development, test, and production structure. This means a base of three workspaces:
+
+- **Development** (or dev)
+- **Test** (which can be called test or UAT for user acceptance testing)
+- **Production** (or prod)
+
+Once development work reaches a stable milestone, we move the content from development to a test environment for validation and quality assurance. The test environment should be accessed by users who will test the reports before they're published to a production environment. The test workspace would normally mirror the production environment in terms of its configuration and security settings, allowing users to review functionality, validate data accuracy, and conduct user acceptance testing. This testing phase ensures that all reports meet business requirements and perform optimally before reaching end users. Once testing has been completed, we promote the report content to the production environment.
+
+This production workspace represents the live business environment with formal governance controls, monitored refresh schedules, and established support procedures. The maintenance phase encompasses ongoing activities such as data refresh monitoring, performance optimization, user access reviews, and content updates to ensure continued business value delivery across all environments.
+
+Successful workspace life cycle management requires the implementation of automated governance frameworks, regular audit processes, and clear escalation procedures to address issues promptly. We know many organizations don't follow these practices, but we recommend that you review what would help your organization.
+
+#### 13.1.4.1 Deployment pipelines
+
+Deployment pipelines are a Power BI capability that allows the cloning of content from one workspace to another. For example, in our scenario, we can clone and deploy from development to test and from test to production:
+
+![Figure 13.4 - Creating a deployment pipeline](ch_assets/page_327.png)
+
+```
+   Deployment pipelines - New pipeline
+
+   +--- Create a deployment pipeline -------------+
+   |                                               |
+   |  Pipeline name:  [ Finance Reports        ]   |
+   |  Description:    [ Dev -> Test -> Prod    ]   |
+   |                                               |
+   |  Stages:                                       |
+   |    [ Development ]   --->   [ Test ]          |
+   |          |                      |              |
+   |          v                      v              |
+   |     assign content         deploy             |
+   |    (datasets, reports)                        |
+   |                                               |
+   |  [ Create ]    [ Cancel ]                     |
+   +-----------------------------------------------+
+   Requires:  Premium per user  or  Fabric capacity
+```
+
+When cloning an environment, the components are as follows:
+
+- **Datasets**
+- **Reports**
+- **Data flows**
+- **Dashboards**
+- **Paginated reports**
+
+Once the pipeline has been created and content assigned, the pipeline can be deployed.
+
+We should note that deployment pipelines in Power BI are a Premium license feature, requiring a Premium Per User or Fabric license. They make the process of moving reports through the development cycle far easier, largely removing the risk of uploading the wrong semantic model and report.
+
+## 13.2 Sharing reports
+
+When a user within the organization requires a report, it can be shared from within the workspace either directly or as a Power BI app. We will discuss both and the use cases for each.
+
+### 13.2.1 Workspace versus app sharing
+
+You can share reports with users directly from the production workspace. This is done by adding users via the **Manage Access** button. As mentioned earlier, there are different access options, and **Viewer** should be the default for most users. **Contributor** and **Member** allow users to change reports, which should only be done when planned. Having certain users make changes to reports on a whim can be very frustrating for other users.
+
+We advise against sharing the production workspace, and workspaces in general, with anything other than a very limited number of users. Workspaces, in general, don't provide the best user experience for navigating between reports, as users need to click in and out of reports to navigate between them. This is where Power BI apps have become the default sharing method for most deployments.
+
+Power BI apps allow you to build a collection of reports in an easy-to-navigate package for groups of users. Users can easily navigate between reports within the app, and folder structures can be built that mirror organizational structure. Within your Power BI environment, you can build one or many apps that users can download. When we say download, they only download to their own app workspace.
+
+After adding the content to the app, you'll need to add an audience. An audience is a list of users who can access the app, and you can add one or many audiences who can see different reports within a single app. As you can see, there is a lot of flexibility and decisions to make with Power BI apps. Do you choose one app and multiple audiences or many apps and single audiences? Or multiple apps with multiple audiences? In reality, you would go with whatever suits your user base.
+
+Apps are a view-only experience for your users, although they can manipulate slicers and use buttons within the reports. With a list of multiple reports, users can quickly click in and out of reports with ease when accessing an app.
+
+When deploying apps, it's best to avoid giving users access to workspaces. There still needs to be a method for users to access the underlying data: the **Manage Permissions** option, which you'll find when clicking on the ellipses against the semantic model that's linked to the reports. For most users, we recommend that they just have read access to the semantic model.
+
+The benefit of this deployment method is that users don't see the workspaces, just the apps. That then raises the question of when users should have workspace access. The main use of workspaces for users is self-service reporting, where users can build reports against semantic models. For this use case, we recommend a separate workspace from production, as users will have the permissions to change production reports.
+
+As you can see, there are a lot of choices and options for deploying reports to users, and many of those choices will depend on your needs. If you want a robust basic model, we recommend the following:
+
+- Workspaces for development, testing, and production. If you have Premium licenses, use deployment pipelines. Your testers will need access to the test workspace.
+- Apps for the majority of users to interact with reports.
+- If you have a self-service model, separate workspaces for those users so they don't break production reports.
+
+### 13.2.2 Row-level security
+
+Row-level security is, as the name suggests, a way of controlling access to data at the level of a row. What do we mean by that? In the context of finance reporting, let's consider the position of the sales manager. The sales manager is likely to need access to certain data held within the suite of reports, but not all the data. For example, they would expect to be able to access data on sales revenue, costs, and so forth, but the organization might not want them to be able to interrogate data on the salary overheads or building maintenance costs. In this case, row-level security can be used to restrict which accounts or account categories are visible to a user.
+
+The starting point for setting up row-level security is to identify the account categories (for example) that they are permitted to see, and create a role in the Power BI file (**Modeling | Manage Roles**) to which can be attached rules that filter the data:
+
+![Figure 13.5 - Setting up row-level security roles](ch_assets/page_329.png)
+
+```
+   Modeling - Manage roles - Row-level security
+
+   +---- Manage roles: Financial Reporting ----+
+   |  Roles:                                  |
+   |   > Sales Manager       [Edit] [Delete]  |
+   |   > Finance AP          [Edit] [Delete]  |
+   |   > Finance AR          [Edit] [Delete]  |
+   |   > Auditor             [Edit] [Delete]  |
+   |------------------------------------------|
+   |  Role:  Sales Manager                    |
+   |------------------------------------------|
+   |  Table:  Chart of Accounts               |
+   |  Filter: [AccountCategory] IN            |
+   |           { "Revenue", "COGS" }          |
+   |------------------------------------------|
+   |  Table:  GL Transactions                 |
+   |  Filter: [Company] = "USA"               |
+   |------------------------------------------|
+   |  [ Save ]                                |
+   +------------------------------------------+
+```
+
+Now, once the report is published to a workspace, we can assign users to the role. To do this, navigate to the semantic model, click the ellipsis, and select **Security**:
+
+![Figure 13.6 - Adding users to row-level security roles](ch_assets/page_330.png)
+
+```
+   Semantic model - Security (RLS members)
+
+   +---- RLS role membership -------------------+
+   |  Role:        Sales Manager                |
+   |  Members:                                   |
+   |    - jane@contoso.com                      |
+   |    - sales-team                            |
+   |    - (any user logging in as these         |
+   |       accounts will get the role's filter)  |
+   |--------------------------------------------|
+   |  Role:        Finance AP                   |
+   |  Members:                                   |
+   |    - ap-team                               |
+   |    - ann@contoso.com                       |
+   |                                            |
+   |  [ Add member ]   [ Remove ]               |
+   +--------------------------------------------+
+   Note: complex RLS often needs DAX
+   (USERNAME() / USERPRINCIPALNAME())
+```
+
+Most of the time, however, row-level security needs to be much more complex and dynamic than this simple example, and requires a level of DAX coding beyond the scope of this book. There are also pitfalls associated with row-level security that must be considered. First, it will impact report performance as it increases the amount of processing to be done. Second, it can create some inconsistent results. The preceding example does not include all the relevant offset accounts, and therefore, the report will not fully balance. Finally, if done incorrectly, it could lead to unauthorized data access. We therefore recommend taking expert advice before embarking on any project that will require row-level security.
+
+## 13.3 Data refreshes
+
+Refreshing data once the Power BI report has been published within the service is achieved within the service. If the data source is on-premises, a gateway will be required that allows the Power BI service to securely access data on-premises.
+
+The gateway handles authentication, encrypts data during transfer, and can be configured to refresh datasets on a schedule, ensuring your Power BI reports always display current information while maintaining your organization's security requirements and keeping sensitive data within your premises.
+
+The gateway is a software component installed on an on-premises server with access to the data required by the report. Typically, the gateway should be installed on a server that remains available 24/7. If installed on a normal desktop PC or laptop, the gateway would become inaccessible if the machine is turned off. For security reasons, the gateway only requires outbound communications. It "watches" for a signal from the Power BI service that tells it when to send data. That means that no internet services need to reach into your local corporate network.
+
+When a data source is an online service such as Microsoft Dynamics 365 or Office 365, the data connection to Power BI can refresh without the need for a gateway. This makes refreshing data a lot simpler and easier to maintain.
+
+The gateway settings are configured within the Power BI service, under the settings of the semantic data model's **Gateway and cloud connections** tab:
+
+![Figure 13.7 - Configuring a gateway connection](ch_assets/page_331.png)
+
+```
+   Semantic model - Settings - Gateway connection
+
+   +--- Gateway and cloud connections --------+
+   |  Gateway:                                |
+   |   [ contoso-onprem-gateway          v ]   |
+   |                                          |
+   |  Data source:                            |
+   |   [ GL-DB (SQL Server)              v ]   |
+   |                                          |
+   |  Sign-in status:  signed-in (admin)       |
+   |   Test connection:  [OK]                 |
+   |                                          |
+   |  [ Apply ]                               |
+   +------------------------------------------+
+   Note:  gateway is a 24/7 on-prem service
+   that initiates OUTBOUND calls to Power BI
+```
+
+If the data model is an import data model, the limitation of refreshing data is governed by your Power BI license; for example, the **Pro** license allows up to eight refreshes a day.
+
+Scheduling refreshes is configured within the Power BI service, under the settings of the semantic model, and can be set up for daily or weekly refreshes of the data:
+
+![Figure 13.8 - Setting up data refreshes](ch_assets/page_332.png)
+
+```
+   Semantic model - Schedule refresh
+
+   +---- Scheduled refresh --------------------+
+   |  Refresh frequency:                       |
+   |    ( ) Daily                              |
+   |    (o) Weekly    [ Mon Wed Fri  v ]       |
+   |                                            |
+   |  Time:           [ 06:00 AM   v ]          |
+   |  Time zone:      [ UTC          v ]        |
+   |                                            |
+   |  Send refresh failure emails to:          |
+   |    [ dataops@contoso.com             ]    |
+   |                                            |
+   |  [ OneDrive refresh: off ]                |
+   |                                            |
+   |  [ Apply ]                                |
+   +--------------------------------------------+
+   Quota:  Pro  = 8 refreshes / 24 h
+           Premium = 48 refreshes / 24 h
+```
+
+As mentioned, **Pro** licensing allows for 8 refreshes in a 24-hour period, whereas **Premium** licenses allow for 48 refreshes in the same period.
+
+## 13.4 Change control
+
+Once reports are released, refreshes are set up, and users have access, there's still work to do. Businesses evolve, and reporting requirements change. In order to remain relevant, the suite of financial reports must change with the business. It's therefore important that there is a process in place to capture changing user requirements and prioritize those changes. Depending on the size of the organization, this might be as simple as taking in requests via email. In larger organizations, these requests may come in via the IT helpdesk or be submitted to a project management tool such as Jira.
+
+### 13.4.1 Bug or change
+
+When users have issues, a system for enabling support requests will help your deployment. It's useful to divide the requests into bugs and changes, as you may want to resolve bugs quickly and plan changes more deliberately based on organizational need and available resources.
+
+Whether a request is a bug or a change can sometimes be a hard question to answer. Many requests for change are submitted in the form of a bug report, such as "This report doesn't include sales orders." The reality, in this example, is that the report was never designed to include sales orders and, therefore, is a change request, not a bug. This is understandable, as the user may not have been involved in the original requirements gathering and may not know the original specification. Sometimes, users may word their change requests as bug reports, thinking that resolution may get prioritized. In any case, there needs to be a process to establish whether the request is reporting a bug that will need to be fixed or requesting a change that may or may not require immediate action.
+
+### 13.4.2 Planning and implementation changes
+
+Once new requirements have been captured, the next step is to plan which will be worked on and when. This will depend on a number of factors. Here are some examples:
+
+- The number of users requesting the change
+- The cost of making the change
+- The business value of the change
+
+Once the next set of changes is selected and planned, we can move into the development phase.
+
+The implementation of changes is very similar to the initial implementation of a Power BI project, with one important difference: it's vital that you don't break what's already there. That means regression testing is required. It's not sufficient to just test the new features that are being added to a report. You must also test the existing features to ensure that they continue to work as expected. Typically, this can be done with the set of tests carried out when the report was first created. Usually, regression tests don't need to be as comprehensive as initial testing, but they must never be missed.
+
+Once implemented, tested, and ready to publish, the last step before release is communication. It is important to communicate with your users that a change is coming, and how that change affects the reports. Nothing bogs down an IT helpdesk like calls about a change in a report that nobody was expecting. It's often assumed that any such change represents a problem in the application.
+
+Beyond keeping our reports up to date and relevant with new features, the final steps in the reporting life cycle are monitoring and retirement.
+
+Let's start with monitoring the use of our Power BI reports.
+
+### 13.4.3 Monitoring
+
+Usage metrics are available for reports within the Power BI service. Clicking on the ellipses next to a report name will present a **View usage metrics report** option. Once selected, this will open a usage report about the selected reports:
+
+![Figure 13.9 - Accessing the usage metrics](ch_assets/page_334.png)
+
+```
+   Report - ellipsis menu - View usage metrics
+
+   +---- Workspace: Financial Reporting -------+
+   |  Reports:                                 |
+   |   - P&L Monthly                           |
+   |   - Balance Sheet                         |
+   |   - Cash Flow   [...]                     |
+   |              |                            |
+   |              v                            |
+   |   +-------------------+                  |
+   |   | Quick insights    |                  |
+   |   | View usage metrics|   <-- click      |
+   |   | Manage permissions|                  |
+   |   | Delete            |                  |
+   |   +-------------------+                  |
+   |                                            |
+   +--------------------------------------------+
+   Built-in:  View usage metrics report
+   (last 30 days only)
+```
+
+The usage report will show information such as access, views, and viewers. There is also a **Report performance** page. Note that only a month of history is stored within the service:
+
+![Figure 13.10 - The usage report](ch_assets/page_335.png)
+
+```
+   Power BI built-in usage metrics report
+
+   +--- Usage metrics - P&L Monthly ------------+
+   |                                            |
+   |   Daily unique viewers                     |
+   |    25 |               ##                  |
+   |    20 |     ##  ## ##  ##                  |
+   |    15 |     ##  ## ##  ##  ##              |
+   |    10 |     ##  ## ##  ##  ##  ##          |
+   |     5 |     ##  ## ##  ##  ##  ##  ##      |
+   |     0 +--------------------------------    |
+   |        M    T    W    T    F    S    S      |
+   |                                            |
+   |   Top viewers:                            |
+   |     jane@contoso.com     (18 views)        |
+   |     finance-team         (12 views)        |
+   |     sarah@contoso.com    ( 7 views)        |
+   |                                            |
+   |   Distribution method:  web (browser)      |
+   |                          mobile app        |
+   |                          embedded          |
+   +--------------------------------------------+
+   Tip:  pair with Report performance page
+```
+
+### 13.4.4 Maintenance and retirement of reports
+
+Within the service, there are no limits to the number of workspaces or the number of semantic models, reports, or dashboards. With that in mind, it is always a good idea to keep the environment lean and only have the reports required within the service. For example, there is little point in having report v1, report v2, and report v3 in a workspace when users will only access report v3. A general tidy-up is recommended; delete unnecessary reports, semantic models, and workspaces if they are not used or required.
+
+It's important to work with users and communicate these plans, especially plans to delete reports. An alternative method to straight deletion may be a retirement process where reports are moved to an archive workspace and deleted if not required after a set period, say, six months.
+
+## 13.5 Summary
+
+This chapter has covered a lot of ground. We started by describing security and the admin portal, and the importance of restricting publishing to the web.
+
+We then moved on to setting up workspaces, publishing reports, and methods of managing the development process with your workspaces. From there, we explained the importance of using Power BI apps as the main delivery mechanism of reports to your users.
+
+We explained data refresh and the difference between on-premises gateways and cloud apps that may not require the gateway.
+
+Along the way, we expanded on security by briefly explaining row-level security as a method to filter your dataset according to user needs and responsibilities.
+
+We ended the chapter on the importance of longer-term maintenance and retirement of reports to ensure your reports are current and old reports are not lingering within your environment.
+
+With this, we have reached the end of this book. By now, you should have a good appreciation of how you can leverage Power BI to deliver high-quality, maintainable financial reporting to your users, from sourcing data through to how to use DAX and Power Query to ensure calculations are done robustly and data models are efficient. You will have an appreciation of how you can go about enriching your financial data with additional datasets, and how best to visualize the data. Finally, we have covered how to ensure that everything works as expected and more abstract topics around how to leverage AI and how to manage your reports into the future. We would like to thank you for reading, and wish you an enjoyable future developing financial reports in Power BI.

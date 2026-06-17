@@ -185,6 +185,8 @@ The other major consideration that would drive a Power BI project is the need to
 
 Your stakeholders are people involved and impacted by the project. We've provided the following list of some common stakeholders that we see in the projects we serve. The list is role-based, so one individual could fill multiple roles, and we recommend that all roles are considered, even if you initially feel that not all roles are relevant. For example, if you don't have a data security function within your organization, this should be a good reason to assign someone to understand the risk of data leakage and methods to mitigate the risks.
 
+
+
 - **Project sponsor:**
   - For Power BI and finance projects, usually the CFO, but it can also be the CEO.
   - Has the authority to approve budgets, changes, and key project decisions.

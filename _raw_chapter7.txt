@@ -1,0 +1,616 @@
+
+
+===== PAGE 178 =====
+
+7
+Incorporating Budgets and
+Targets
+In the previous chapter, we worked through some of the most important functions you'll use
+within Power Query to help reduce and shape your data. In this chapter, we'll move back to a
+topic more focused on finance, which is how to incorporate your budget data into your
+financial model.
+Incorporating budgets is an important part of financial modeling as it provides the basis to
+measure performance and track and analyze differences between budget and actuals. In this
+chapter, we'll cover the following topics:
+What you need to join your budget data to your financial model
+How to join the budget table to the financial model
+Writing measures to calculate the differences between budgets and actuals
+Choosing the correct visuals to see high-level differences that can easily be
+interrogated through expanding a matrix and drill-through
+As budgeting processes can vary significantly between organizations, we're following an
+approach based on an Excel-based budget, tracked monthly against the GL accounts of the
+financial application. This is a simple and common method, and the techniques should be easy
+to follow if using different tools.
+Technical requirements
+To follow the examples in this chapter and beyond, you'll need a Windows PC with an internet
+connection, and you'll 
+idx_494dd3e3also need to download Power BI Desktop.
+• 
+• 
+• 
+• 
+
+
+===== PAGE 179 =====
+
+For more details, we suggest you access the following link, where Microsoft details the
+download process for Power BI Desktop and the PC hardware requirements:
+https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-get-the-desktop.
+The examples outlined in this chapter can be tried out in the Chapter 7.pbix model. A fully
+worked example of multiple budget models can be found in the Chapter 7 – Multiple 
+Models.pbix file. Both files can be found in the GitHub repository here: https://github.com/
+PacktPublishing/Financial-Modeling-with-Power-BI_Packt/tree/main/Chapter7.
+Creating a budget table
+We'll start with the assumption that you already have a process for budgetary management
+and budget data, stored in an Excel spreadsheet.
+Most applications 
+idx_bfabd22cfor financial management will have some sort of budgeting functionality
+built in, but they're often unused. The reasons are varied, although most tools within financial
+management systems don't have the flexibility to manage the specifics of the organizational
+budgetary processes, so it's easier to use a spreadsheet. While we have a lot to say about Excel
+as a data source, budgets and Excel work very well together.
+If you maintain budgets in your financial management application, most of the guidance in
+this chapter should also be useful.
+If you don't have an existing budget spreadsheet, we've provided an example within the 
+Budget.xlsx file in the GitHub repository. The example is typical of the budget tables we work
+with, in matrix format. It's effective for humans but not as effective for Power BI, as we learned
+in the previous chapter; therefore, we'll need to unpivot the data in Power Query. The benefit of
+this approach is that your users can maintain budgets in a friendly way for them, as a matrix,
+and Power Query will unpivot the data to be friendly to Power BI.
+If you're creating a spreadsheet for budgetary management, our example for the exercises will
+fit most use cases. Any template needs to be capable of the following:
+It must be capable of linking to your date table
+It must be 
+idx_822cbc1acapable of linking to the Chart of Accounts (CoA)
+It must contain values in the same currency as the accounting currency of the GL
+The first point to note is that we don't want to join our budgets directly to individual GL
+transactions, so we use the Date and the Chart of Account tables to bridge them and allow us
+to show budgets against transaction totals for the relevant GL account.
+The simplest scenario is a budget value per account, per month:
+• 
+• 
+• 
+Chapter 7
+150
+
+
+===== PAGE 180 =====
+
+Figure 7.1: An example budget spreadsheet
+We're going to use our budget spreadsheet for the examples in this chapter, and the first step is
+to load the data into our Power BI file. On loading, the first thing we note is that the column
+headers have 
+idx_04bf9a33not been recognized. This is often the case when Excel has treated headers as
+dates as you can see in Figure 7.2. Here, you can see Column 1, Column 2, and so on as header
+names and the actual header names in the first row.
+Figure 7.2: Use First Row as Headers
+After you click Use First Row as Headers, you'll see that Power Query promotes the values in
+the first row to the headers, so that's fixed.
+151
+Incorporating Budgets and Targets
+
+
+===== PAGE 181 =====
+
+As discussed in Chapter 6, Streamlining with Power Query, we select the date columns with
+budget values and choose Unpivot Only Selected Columns from the right-click menu. We
+then rename the two columns that Power Query names, Attribute and Value, to Month and 
+Amount so that the names reflect the values within the rows. We do this by double-clicking the
+column header and typing in the new names.
+Now, we can create a Date column from the period number and the financial year:
+Figure 7.3: Creating a Date column
+The final step 
+idx_91ee4a07is to transform the Date column to be formatted as a date and the
+Amount column to be formatted as a currency. We can do this by clicking the Column Type
+icon to the left of the column names.
+Figure 7.4: Unpivoting the budget data
+You'll notice that all budget dates are on the first day of the month. We did this deliberately so
+that we can 
+idx_1a2a5a19utilize the benefits of Power BI's time intelligence (TI) functions to make the
+Chapter 7
+152
+
+
+===== PAGE 182 =====
+
+exercise quicker, as we'll aggregate budgets and actuals by month and year. If Power BI
+recognizes a full date, it'll make TI functions available. We'll explain this in more detail later.
+Once we've done the transformation, it's time to include this in our data model, first by
+clicking Close & Apply in Power Query. We then join the Chart of Accounts and Calendar
+tables to the Budget table by linking the date and AccountNumber fields. We made this easier
+for ourselves 
+idx_724b557ein the Data Model view by creating a new tab to only see the tables we're
+working with:
+Figure 7.5: Budget data model
+We now have the basic data imported, so we're ready to start looking at how we are going to
+use it. The first step will be to deal with budget data stored by months and transactions stored
+daily.
+Handling differences in granularity
+We mentioned idx_8475a878previously that budget and GL transactions have a difference in the level at
+which they store the date. For a start, your monthly budgets are stored on the first day of the
+153
+Incorporating Budgets and Targets
+
+
+===== PAGE 183 =====
+
+month, to utilize TI functions, and your GL transactions are stored based on the transaction
+date. To deal with this, we'll use the Calendar table to aggregate both budget and GL
+transactions based on month and year values to compare the values correctly.
+Comparing values on month and year is the dominant method for reporting, which is what
+we'll focus on for the rest of the chapter. Some organizations may need to budget daily, and we
+explain a method for doing that later in the chapter.
+Budgeting monthly
+Most of the hard work for comparing budget variance monthly has been completed in the
+previous idx_91482e2asteps. A good data model can be your best friend, but we still have some work to
+complete for a basic month-over-month comparison. To begin with, we'll need a few
+measures.
+We'll start with a measure for our GL Transactions table. We will create the following
+measure in our List of Measures table:
+GL Amount = SUM('GL Transactions'[Amount])
+We then need a SUM measure for our budget figures, as follows:
+Budget Amount = SUM(Budget[Amount])
+Finally, for a basic budget comparison, we need a budget variance:
+Budget Variance = [GL Amount] - [Budget Amount]
+Figure 7.6 shows our example, and we have listed all the steps following this:
+Figure 7.6: Month budget report
+Here are the detailed steps:
+We started with a Matrix visual that has the following rows: 
+AccountNumber from the Chart of Account table
+1. 
+◦ 
+Chapter 7
+154
+
+
+===== PAGE 184 =====
+
+AccountName from the Chart of Account table
+AccountCategoryDescription from the Chart of Account table
+Our columns are as follows: 
+Calendar Year Name
+Calendar Month Name
+Our values are as follows: 
+GL Amount
+Budget Amount
+Budget Variance
+We filtered the calendar years 2024 and 2025.
+From the Format options, we chose the Tabular Layout option from the Layout and
+Style presets.
+We then right-clicked one of the AccountNumber rows in the visual and chose Expand | 
+All to show all levels.
+Next, we switched off row and column subtotals from the Format menu.
+To build 
+idx_b75f7c02the conditional formatting on the Budget Variance columns, we clicked the
+down chevron icon against the Budget Variance values block and chose the following
+options for font color: 
+Figure 7.7: Budget Variance font color
+We also added icon-based conditional formatting to the same field, as follows: 
+◦ 
+◦ 
+2. 
+◦ 
+◦ 
+3. 
+◦ 
+◦ 
+◦ 
+4. 
+5. 
+6. 
+7. 
+8. 
+9. 
+155
+Incorporating Budgets and Targets
+
+
+===== PAGE 185 =====
+
+Figure 7.8: Budget Variance icons
+How you 
+idx_26143d5dformat and calculate variances for monthly budgeting is an organizational
+preference, so please experiment with the steps we've provided and find formats and styles
+that work for you. The most important part of the monthly budgeting exercise was to build a
+model that makes reporting on budgeting variances fast and accurate.
+There are so many directions that you can take this budget model. You can add slicers to help
+focus on data or change the layout of the matrix to use the Expand and collapse setting of the
+hierarchy. Change the conditional formats to help you identify where your budget variance is
+healthy and where it's an issue for the organization. Whichever direction you choose to pursue,
+we recommend that you focus more on good modeling techniques to provide accuracy and less
+on DAX to generate budget comparisons.
+A quick note on conditional formatting
+We wanted to show anything below zero with a red icon and above zero with a green
+icon. Therefore, the upper and lower limit values (i.e., the value that the top line must
+be greater than and the bottom line must be less than) are set to –9999999 and
+9999999, respectively, to ensure they are outside the range of possible values that could
+be reported. It's arbitrary but works.
+Note
+Chapter 7
+156
+
+
+===== PAGE 186 =====
+
+Budgeting daily
+First, we should 
+idx_3001c4ec onsider why we would want to create daily budgets – after all, it would be
+rare to need to view budgets down to the day level. Broadly speaking, there are two places
+where this method is useful:
+Where you need to report against budgets at a lower level than monthly, such as
+weekly, especially since weeks do not neatly fit into months – this is a rare use case but
+does occasionally show up in some highly seasonal businesses, or where a business's
+performance can be impacted by events that vary by date between years.
+Where you need to pro-rata the budget to report against month or year-to-date figures,
+and you may be partway through a month.
+Moreover, the techniques covered here can be adapted to other situations where you need to
+compare datasets stored in different levels of detail.
+There are idx_50ee446avarious methods for daily budgeting, and a certain amount will depend on the data
+you have available and organizational preferences. Based on the demonstration data we've
+generated, the method we'll use will be to spread the monthly budget sum over the days of the
+month. If your organization has created daily budgets, please use the monthly method instead
+of consolidating daily via the date table.
+In our example, the budget for each day in April, for example, would be calculated as 1/30 of
+the total budget for the month:
+To start, we need to create three calculated columns on our Budget table.
+The first is a Month and Year column that will be used for the next column we create:
+Month and Year = FORMAT(Budget[Date], "MMMM")&" "&YEAR(Budget[Date])
+Similarly, we need to create a column in the Calendar table:
+Month and Year = 'Calendar'[Calendar Month Name ] & " "
+&'Calendar'[Calendar Year Name ]
+You'll notice that the DAX returns Month and Year values that are identical to the values
+in the Calendar table.
+The next column uses the preceding column to return a count of days for the given
+month based on COUNTROWS from the Calendar table:
+Days in Month = CALCULATE(
+• 
+• 
+1. 
+157
+Incorporating Budgets and Targets
+
+
+===== PAGE 187 =====
+
+COUNTROWS('Calendar'),
+FILTER(
+'Calendar',
+Budget[Month and Year] = 'Calendar'[Month and Year])
+)
+The third column is a simple DIVIDE operation of the month budget amount and the
+days in the month, as follows and shown in Figure 7.9:
+Daily Amount = DIVIDE(Budget[Amount], Budget[Days in Month])
+Figure 7.9: Extending the Budget table for daily budgets
+Figure 7.9 shows a view of how your Budget table should look with the additional
+fields.
+The next 
+idx_bb53cb97step is to create a daily budget table through a CROSSJOIN operation of the 
+Calendar table and the Budget table. As the Calendar table has a row for each day of
+the year, it provides the basis to populate a new table with daily budget values. To
+2. 
+Chapter 7
+158
+
+
+===== PAGE 188 =====
+
+build this table, we go to Modeling | New Table when in the Report view, or Home | 
+New Table from the Table view.
+Then, we use the following DAX to create our table: 
+Daily Budget =
+FILTER(
+CROSSJOIN(
+SELECTCOLUMNS('Calendar',
+'Calendar'[Full Date],
+'Calendar'[Month and Year]),
+SELECTCOLUMNS(Budget,
+Budget[Daily Amount],
+Budget[Month and Year],
+Budget[AccountNumber],
+Budget[TransLink])
+        ),
+'Calendar'[Month and Year] = Budget[Month and Year])
+The resulting table will look like Figure 7.10:
+Figure 7.10: Daily Budget table
+3. 
+159
+Incorporating Budgets and Targets
+
+
+===== PAGE 189 =====
+
+This can be 
+idx_a63a7d67joined into our model, joining the Calendar Full Date values to the Full Date
+values of the Calendar table and the TransLink values to the LinkID values of the Chart of
+Account table.
+In the next section, we'll continue our development of budget models by looking at drill-
+through.
+Seeing the details with drill-through
+So far, we've created a budget table, joined it to our model, and explained how you can use
+monthly and 
+idx_d7288603daily calculations to compare the budget to actuals from your GL transactions.
+Our final step for budgeting is drill-through. Budgeting is an area where the ability to examine
+underlying transactions is important, so a quick method to go from a calculated summary of
+data to detail is valued by most users. Drill-through in Power BI is a relatively simple-to-set-up
+but powerful function that we can add to many reports, not just budgeting.
+To add drill-through to your report, start by creating a tab on your canvas by clicking the plus
+sign next to the current tab. We have called ours Drill through so that its purpose is clear.
+For our drill-through, we'll start with a table visual, and we'll add the following fields:
+Chart of Accounts: AccountNumber
+Chart of Accounts: AccountName
+Chart of Accounts: AccountCategoryDescription
+GL Transactions: TransactionDate
+GL Transactions: Company
+GL Transactions: TransactionID
+List of Measures: GL Amount
+The table will provide the data that's returned from the drill-through, but we need to link the 
+Budget table to the 
+idx_bbe77b55drill-through. This is done via the drill-through section of the 
+Visualizations pane, shown in Figure 7.11 Here, we add the GL Amount field from the List of
+Measures table.
+• 
+• 
+• 
+• 
+• 
+• 
+• 
+Chapter 7
+160
+
+
+===== PAGE 190 =====
+
+Figure 7.11: Drill-through table
+You'll also notice that when you add the GL Amount field to enable the drill-through, Power BI
+adds a back-arrow icon to the top left of the screen. This is a UI element for the user to return to
+the original report when they've viewed the drill-through data.
+If you return to the Budget page and right-click any of the GL Amount values, you'll see a Drill
+through option in the right-click menu. Hover over Drill through, and you'll see Budget 
+Drillthrough appear, indicating that the action will take you to the Drill through tab.
+Figure 7.12: Drill through click option
+When you click Drill through, you'll be taken to the Drill through tab, which will be filtered
+according to 
+idx_012b0be1the state of the Budget table. You can't see from Figure 7.12 that the value we right-
+clicked was $216,629.21. The drill-through action took us to Figure 7.13:
+161
+Incorporating Budgets and Targets
+
+
+===== PAGE 191 =====
+
+Figure 7.13: Drill-through complete
+You'll notice that drill-through filters are displayed on the right-hand side of the screen, where
+you will be able to change them – an action that can be useful when investigating the data.
+Figure 7.14: Drill-through filters
+Chapter 7
+162
+
+
+===== PAGE 192 =====
+
+To return to the Budget screen (or the source of the drill-through), click the back-arrow icon in
+the top left 
+idx_dc94f3abof the screen. Please note that you can move the back-arrow icon anywhere on the
+screen.
+Drill-through is very common for financial and transactional reporting. Most users, when
+seeing a variance or an issue, will want to view the underlying transactions; drill-through
+enables this. It has the benefit of being quick to set up, and you can incorporate many drill-
+throughs against a dataset for different scenarios.
+Visuals to consider for analyzing budgets
+We used a matrix and drill-through for our examples, which is often the default for
+highlighting idx_d3741e49the difference between the budget and actuals, as conditional formatting can be
+used effectively to highlight differences, and users can see numerical totals. However,
+depending on user preferences, here are some alternatives you may like to consider:
+Clustered column or bar charts with side-by-side measures that show budgets and
+actuals are very effective, as users can quickly spot differences between the height or
+length of columns/bars to identify issues. This is particularly effective in seeing the
+magnitude of differences through relative size.
+Figure 7.15: Budget as a column chart
+The Gauge visual shows 
+idx_96fda800an effective high-level view of differences through a classic
+speedometer style, showing how the budget compares to the actuals or vice versa. The 
+• 
+• 
+163
+Incorporating Budgets and Targets
+
+
+===== PAGE 193 =====
+
+Gauge visual is effectively used in dashboards where users want to see performance at
+a glance.
+Figure 7.16: Budget as a gauge
+The New Card visual (still Card (new) in the UI at the time of writing) has great
+methods to show comparisons of values at a high level. Like the Gauge visual, the New
+Card visual is effective for at-a-glance dashboards.
+Figure 7.17: Budget as a card
+Less used for 
+idx_8bfc0459financial budgets, but still worth consideration, is the Waterfall Chart
+visual, which shows a step-by-step view of positive and negative variances.
+• 
+• 
+Chapter 7
+164
+
+
+===== PAGE 194 =====
+
+Figure 7.18: Budget as a waterfall
+We encourage you to experiment and work with your users on the best visuals for your
+budgeting needs. There is no right or wrong answer to most areas of analytics; whatever best
+serves your users or business case should be the visual you use. As we mentioned, we chose the
+Matrix visual with conditional formatting for this chapter as it's the visual we most often
+deploy, but as you 
+idx_01dc20c2can see from the preceding content, there are many options.
+For many organizations, this is everything required for budgeting. However, in some cases,
+there's a need for a more complex model that includes different scenarios or models. We cover
+this advanced topic in the final section of this chapter.
+Working with multiple budget models or scenarios
+So far, we've presented a reasonably simple budget model: one company and one budget. Of
+course, in reality, you'll probably manage budgets for multiple companies and then manage
+revisions 
+idx_6432373cto those multiple budgets. And let's not forget multiple budgeting methods. Budgets
+can be complex, so in this section, we have a few tips and tricks to help you deal with that
+complexity.
+We'll start with the most important part, which is why common data structures enable easy
+consolidation of budgets, then move on to techniques in Power BI that'll allow you to manage
+multiple budget versions and revisions.
+165
+Incorporating Budgets and Targets
+
+
+===== PAGE 195 =====
+
+Maintaining a common structure
+Unapologetically, we'll labor the point that the best advice we can provide is one of the
+fundamentals of data management: maintain a common data structure.
+We often 
+idx_f842f3dadeal with the issues that result from not maintaining a common data structure, so we
+have a lot of experience here. As you've seen from the examples within this chapter, budget
+comparisons are not inherently complicated, with a common data structure.
+Financial applications are good at enforcing data structures, as users are given little choice; you
+can't change field labels in QuickBooks or enter TBD into a SAP numeric field. However, we've
+deliberately used Excel as the foundation for budgeting, and experience tells us that some
+users will be adept at breaking the nicely structured workbook you carefully built – changing a
+few column headers, adding in some extra rows, or adding "N/A" to a cell where a number was
+required. Sure, Excel will continue to function with these changes, but it'll break Power BI
+when the data is loaded.
+Keeping a common structure can be a challenge for the aforementioned reasons, but it's
+essential for consolidation if you want to work with multiple budgets and manage change over
+the long term. We don't have too many technical solutions for this one, other than using
+everything in Excel's arsenal for worksheet protection and data validations to stop users from
+having free rein over the worksheet. If you get defeated here, Canvas Power Apps can be built to
+give an Excel look and feel, where users can't make those tiny changes that break the model. It
+can be a battle, but it's a battle you need to win if you want to easily consolidate any Excel data.
+Using Power Query to incorporate your budgets into
+one table
+Let's start 
+idx_8a77d66cby assuming you've won the 
+idx_edefb045battle for a common template that users can't or just
+don't break. With multiple companies, organizations, or departments, you'll then have to
+manage multiple files, delivered at multiple times from multiple people. Power Query and
+some standard Microsoft tools can come to your assistance.
+If your budget files are in a common SharePoint folder (which can include sub-folders), you can
+easily combine files by connecting to the folder from Power BI, then using Power Query to
+extract the data from the separate files into a common table. When selecting your data source
+from Power BI or Power Query, choose the option for a SharePoint folder. When you import the
+data, this option will allow you to append the files into a single table. A pro tip here is to add
+details to the Excel filename as you can also include that as a column in the data, and it'll help
+you classify your data.
+Chapter 7
+166
+
+
+===== PAGE 196 =====
+
+If your files are in many locations but you can access them from Power BI, you can use the 
+Append feature in Power Query to incorporate the separate files into a single table. Similar to
+what was mentioned in the preceding paragraph, it's a good idea to add a reference to each file
+so that you can classify them later. This may include the year, organization, and revision, and
+will be useful for slicing the data when comparing budgets.
+As budgets are live and being changed frequently, you'll be able to refresh the data with any
+changes. As time rolls by, it's advisable to think about long-term storage of those spreadsheets
+beyond Excel, such as a Dataflow, Dataverse, or a SQL database.
+Managing multiple budgeting methods
+If you 
+idx_4c09cbc2use different budgeting methods within companies or departments, you'll have to
+consider how you report that information in a unified manner. For example, you may use both
+incremental and zero-based budgeting methods within the organization, so you'll need to
+normalize how budgets are presented for consolidated reporting. When we say normalized, we
+refer to a method of providing a common basis for the budgets so that they can be compared.
+You may choose to use your incremental budget as it stands, then normalize your zero-based
+budget by calculating the minimum run rate to maintain the organizational plan for the year.
+Exactly how you do that is up to the organization, but for our purposes, it's essential that you
+follow the principles from the previous section, which is to use a common data structure.
+With the budgets normalized, you can work with the data on the basis of a common model,
+using the same fields on both. For all reporting entities, it's important to identify the budgeting
+method idx_dc99cbf6for later reference. The methods described previously can be used to import data from
+SharePoint or to append within Power Query and compare it back to actual business
+performance.
+Managing budget revisions
+It's a common requirement for budgets to be revised within a financial year. The business
+requirement idx_454b96e7may have changed, you may have seen a new competitor, or a business strategy
+may be so successful that you need to find ways to capitalize on or deal with the environment.
+Whatever has happened, your initial budget has changed, and you need to accommodate that
+change.
+We know we're repeating ourselves, but again, common data structures will be your best
+friend.
+After data structures, the first consideration is not to overwrite the original budget; otherwise,
+you'll lose history and assumptions about how and why the budget was set. When looking
+back, the starting assumptions may seem crazy, but they were valid assumptions at the time;
+you had no idea what was going to change. Revised budgets should always be new versions,
+167
+Incorporating Budgets and Targets
+
+
+===== PAGE 197 =====
+
+separate from the original and comparable. You can do this by copying the original version and
+adding the version so that you can use DAX and slicers for comparison. Although you may not
+immediately compare the original and revised budgets, it's often a good exercise to measure
+the variations between actuals-to-budget versions and budget-to-budget versions. It's a good
+test of your budgeting processes.
+If you plan to revise budgets at some point in the year, make sure you have fields that track
+budget versions, dates, and free-text notes for concise descriptions to describe the reasons for
+the change. If you didn't plan to revise your budget and subsequently revise your budget, add a
+field with the revision version.
+Managing multiple budgets in your model
+When you have multiple budgets in your model, it's important to make sure your comparisons
+are clearly 
+idx_e25b7d00defined and the calculations are correct. The comparative calculations we've
+described in this chapter will work for comparisons of multiple budgets, but you'll need to
+make sure the calculations are specific to the requirement.
+In the case of budget complexity, we generally prefer to use DAX to "hardcode" our
+comparisons with clear explanations of the comparisons; the alternative is using on-screen
+slicers and visual or page filters. The purpose of this is that when users work with the
+measures, they can't change the filter context and accidentally report something that is
+misleading or incorrect. The explanations should be in the form of clear measure labels and the
+use of inline descriptions within the DAX. For anyone unsure, a well-written DAX measure
+with an inline description follows:
+Budget Variance USA $ = [GL Amount USA +] - [Budget Amount USA]
+// takes the absolute value of the GL and deducts from the budget amount for a 
+direct comparison of budget to actual values
+In this case, we're referring to measures that calculate and filter budget values for the US,
+separate from other countries. We've clearly labeled the country and the currency in the
+measure and included a description of the purpose of the measure.
+Please note that starting a new line with "//" in Power BI tells IntelliSense to ignore the text
+that follows as part of the calculation. We use this to document the calculation inline with the
+actual calculation statement.
+We also like 
+idx_9daef329to use display folders within our List of Measures table to make the
+organization of the measures easier for us and our users.
+The key to managing multiple budgets is clear organization. The calculations are rarely
+complicated, but you're dealing with many versions of similar data, so it's important to plan
+Chapter 7
+168
+
+
+===== PAGE 198 =====
+
+around the risks of duplication and users working with the wrong version, which is very real.
+In some instances, it may be the best option to use Power Query to filter out previous revisions
+so that the data is retained but not presented to the user. If you plan around what can go
+wrong with multiple versions of similar data, you should be in a good position.
+In this section, we discussed the potential complexity of dealing with multiple budgets. We
+started by discussing the need for a consistent data structure as a foundation for success. Then,
+we moved on to incorporating and managing multiple methods and revisions, and how to stay
+on top of the process of budgeting. With some careful organization and planning, the process is
+manageable, and Power BI will deliver some excellent analysis for your users.
+Summary
+This chapter covered budgets and how you can incorporate and interrogate budgets into your
+data. Along the way, we also introduced some new functions in calculated tables and drill-
+through, both of which we're sure you'll find immensely useful across many of your Power BI
+reports. We ended the chapter by considering some of the options you may like to consider for
+visually displaying budget-to-actual variances.
+In the next chapter, we turn our attention to another applied finance topic, which is inventory.
+Get this book's PDF version and more
+Scan the QR code (or go to https://www.packtpub.com/unlock). Search for this book by name,
+confirm the edition, and then follow the steps on the page.
+Note: Keep your invoice handy. Purchases made directly from Packt don't require an invoice.
+169
+Incorporating Budgets and Targets
+
+
+===== PAGE 199 =====
+

@@ -1,0 +1,195 @@
+{
+  "chapter_num": 7,
+  "chapter_title": "Incorporating Budgets and Targets",
+  "start_page": 178,
+  "end_page": 199,
+  "figures": {
+    "7.1": 180,
+    "7.2": 180,
+    "7.3": 181,
+    "7.4": 181,
+    "7.5": 182,
+    "7.6": 183,
+    "7.7": 184,
+    "7.8": 185,
+    "7.9": 187,
+    "7.10": 188,
+    "7.11": 190,
+    "7.12": 190,
+    "7.13": 191,
+    "7.14": 191,
+    "7.15": 192,
+    "7.16": 193,
+    "7.17": 193,
+    "7.18": 194
+  },
+  "figure_captions": {
+    "7.1": "An example budget spreadsheet",
+    "7.2": "Use First Row as Headers",
+    "7.3": "Creating a Date column",
+    "7.4": "Unpivoting the budget data",
+    "7.5": "Budget data model",
+    "7.6": "Month budget report",
+    "7.7": "Budget Variance font color",
+    "7.8": "Budget Variance icons",
+    "7.9": "Extending the Budget table for daily budgets",
+    "7.10": "Daily Budget table",
+    "7.11": "Drill-through table",
+    "7.12": "Drill through click option",
+    "7.13": "Drill-through complete",
+    "7.14": "Drill-through filters",
+    "7.15": "Budget as a column chart",
+    "7.16": "Budget as a gauge",
+    "7.17": "Budget as a card",
+    "7.18": "Budget as a waterfall"
+  },
+  "rendered_pages": {
+    "180": "page_180.png",
+    "181": "page_181.png",
+    "182": "page_182.png",
+    "183": "page_183.png",
+    "184": "page_184.png",
+    "185": "page_185.png",
+    "187": "page_187.png",
+    "188": "page_188.png",
+    "190": "page_190.png",
+    "191": "page_191.png",
+    "192": "page_192.png",
+    "193": "page_193.png",
+    "194": "page_194.png"
+  },
+  "tables": [
+    [
+      183,
+      0,
+      [
+        [
+          "",
+          "",
+          "GL Amount = SUM('GL Transactions'[Amount])",
+          ""
+        ]
+      ]
+    ],
+    [
+      183,
+      1,
+      [
+        [
+          "",
+          "",
+          "Budget Amount = SUM(Budget[Amount])",
+          ""
+        ]
+      ]
+    ],
+    [
+      183,
+      2,
+      [
+        [
+          "",
+          "",
+          "Budget Variance = [GL Amount] - [Budget Amount]",
+          ""
+        ]
+      ]
+    ],
+    [
+      185,
+      0,
+      [
+        [
+          ""
+        ],
+        [
+          "Note"
+        ]
+      ]
+    ],
+    [
+      186,
+      0,
+      [
+        [
+          "",
+          "",
+          "Month and Year = FORMAT(Budget[Date], \"MMMM\")&\" \"&YEAR(Budget[Date])",
+          ""
+        ]
+      ]
+    ],
+    [
+      186,
+      1,
+      [
+        [
+          "",
+          "",
+          "Month and Year = 'Calendar'[Calendar Month Name ] & \" \"\n&'Calendar'[Calendar Year Name ]",
+          ""
+        ]
+      ]
+    ],
+    [
+      186,
+      2,
+      [
+        [
+          "",
+          "",
+          "Days in Month = CALCULATE(",
+          ""
+        ]
+      ]
+    ],
+    [
+      187,
+      0,
+      [
+        [
+          "",
+          "",
+          "COUNTROWS('Calendar'),\nFILTER(\n'Calendar',\nBudget[Month and Year] = 'Calendar'[Month and Year])\n)",
+          ""
+        ]
+      ]
+    ],
+    [
+      187,
+      1,
+      [
+        [
+          "",
+          "",
+          "Daily Amount = DIVIDE(Budget[Amount], Budget[Days in Month])",
+          ""
+        ]
+      ]
+    ],
+    [
+      188,
+      0,
+      [
+        [
+          "",
+          "",
+          "Daily Budget =\nFILTER(\nCROSSJOIN(\nSELECTCOLUMNS('Calendar',\n'Calendar'[Full Date],\n'Calendar'[Month and Year]),\nSELECTCOLUMNS(Budget,\nBudget[Daily Amount],\nBudget[Month and Year],\nBudget[AccountNumber],\nBudget[TransLink])\n),\n'Calendar'[Month and Year] = Budget[Month and Year])",
+          ""
+        ]
+      ]
+    ],
+    [
+      197,
+      0,
+      [
+        [
+          "",
+          "",
+          "Budget Variance USA $ = [GL Amount USA +] - [Budget Amount USA]\n// takes the absolute value of the GL and deducts from the budget amount for a\ndirect comparison of budget to actual values",
+          ""
+        ]
+      ]
+    ]
+  ]
+}

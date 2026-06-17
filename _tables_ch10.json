@@ -1,0 +1,73 @@
+[
+  {
+    "page": 265,
+    "idx": 0,
+    "rows": [
+      [
+        "",
+        "",
+        "Total Revenue = CALCULATE(\n[Total amount],\nFILTER(\n'Chart of Account',\n'Chart of Account' [AccountCategory]=\"SALES\" ||\n'Chart of Account' [AccountCategory]=\"OTHERINC\"\n)\n)*-1\nTotal Revenue = CALCULATE(\n[Total amount],\nFILTER(\n'Chart of Account',\n'Chart of Account' [AccountCategory]=\"SALE\" ||\n'Chart of Account' [AccountCategory]=\"OTHER1NC\"\n)\n)*-1",
+        ""
+      ]
+    ]
+  },
+  {
+    "page": 265,
+    "idx": 1,
+    "rows": [
+      [
+        "'Chart of Account'",
+        ","
+      ]
+    ]
+  },
+  {
+    "page": 265,
+    "idx": 2,
+    "rows": [
+      [
+        "'Chart of Account'",
+        "[",
+        "AccountCategory",
+        "]=",
+        "\"SALES\"",
+        "||"
+      ]
+    ]
+  },
+  {
+    "page": 265,
+    "idx": 3,
+    "rows": [
+      [
+        "'Chart of Account'",
+        "[",
+        "AccountCategory",
+        "]=",
+        "\"OTHERINC\""
+      ]
+    ]
+  },
+  {
+    "page": 265,
+    "idx": 4,
+    "rows": [
+      [
+        "'Chart of Account'",
+        ","
+      ]
+    ]
+  },
+  {
+    "page": 273,
+    "idx": 0,
+    "rows": [
+      [
+        ""
+      ],
+      [
+        "Tip"
+      ]
+    ]
+  }
+]

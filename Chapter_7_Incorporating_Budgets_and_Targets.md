@@ -1,22 +1,29 @@
-# Chapter 7: Incorporating Budgets and Targets
+# 7 Incorporating Budgets and Targets
 
-**Source: *Financial Modeling and Reporting with Microsoft Power BI* (Packt Publishing, 2026)**
-
+Source: *Financial Modeling and Reporting with Microsoft Power BI* (Packt Publishing, 2026)
 DOI: 10.0000/PACKT_FMRWPB_2026  |  GitHub: https://github.com/PacktPublishing/Financial-Modeling-with-Power-BI_Packt/tree/main/Chapter7
+Page range: 178 - 199
 
-_Page range: 178 - 199_
+## Introduction
 
----
+In the previous chapter, we worked through some of the most important functions you'll use within Power Query to help reduce and shape your data. In this chapter, we'll move back to a topic more focused on finance, which is how to incorporate your budget data into your financial model.
+
+Incorporating budgets is an important part of financial modeling as it provides the basis to measure performance and track and analyze differences between budget and actuals. In this chapter, we'll cover the following topics:
+
+- What you need to join your budget data to your financial model
+- How to join the budget table to the financial model
+- Writing measures to calculate the differences between budgets and actuals
+- Choosing the correct visuals to see high-level differences that can easily be interrogated through expanding a matrix and drill-through
+
+As budgeting processes can vary significantly between organizations, we're following an approach based on an Excel-based budget, tracked monthly against the GL accounts of the financial application. This is a simple and common method, and the techniques should be easy to follow if using different tools.
 
 ## 7.1 Technical requirements
 
 To follow the examples in this chapter and beyond, you'll need a Windows PC with an internet connection, and you'll also need to download Power BI Desktop.
 
-For more details, see Microsoft's download page for Power BI Desktop at <https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-get-the-desktop>.
+For more details, we suggest you access the following link, where Microsoft details the download process for Power BI Desktop and the PC hardware requirements: <https://learn.microsoft.com/en-us/power-bi/fundamentals/desktop-get-the-desktop>.
 
-The examples in this chapter can be tried out in the `Chapter 7.pbix` model. A fully worked example of multiple budget models is available in the `Chapter 7 - Multiple Models.pbix` file. Both files are in the GitHub repository at <https://github.com/PacktPublishing/Financial-Modeling-with-Power-BI_Packt/tree/main/Chapter7>.
-
----
+The examples outlined in this chapter can be tried out in the `Chapter 7.pbix` model. A fully worked example of multiple budget models can be found in the `Chapter 7 - Multiple Models.pbix` file. Both files can be found in the GitHub repository here: <https://github.com/PacktPublishing/Financial-Modeling-with-Power-BI_Packt/tree/main/Chapter7>.
 
 ## 7.2 Creating a budget table
 
@@ -26,17 +33,17 @@ Most applications for financial management will have some sort of budgeting func
 
 If you maintain budgets in your financial management application, most of the guidance in this chapter should also be useful.
 
-If you don't have an existing budget spreadsheet, an example is provided in the `Budget.xlsx` file in the GitHub repository. The example is typical of the budget tables we work with, in matrix format. It's effective for humans but not as effective for Power BI, as we learned in the previous chapter; therefore, we'll need to unpivot the data in Power Query. The benefit of this approach is that your users can maintain budgets in a friendly way for them, as a matrix, and Power Query will unpivot the data to be friendly to Power BI.
+If you don't have an existing budget spreadsheet, we've provided an example within the `Budget.xlsx` file in the GitHub repository. The example is typical of the budget tables we work with, in matrix format. It's effective for humans but not as effective for Power BI, as we learned in the previous chapter; therefore, we'll need to unpivot the data in Power Query. The benefit of this approach is that your users can maintain budgets in a friendly way for them, as a matrix, and Power Query will unpivot the data to be friendly to Power BI.
 
 If you're creating a spreadsheet for budgetary management, our example for the exercises will fit most use cases. Any template needs to be capable of the following:
 
-- It must be capable of linking to your date table.
-- It must be capable of linking to the Chart of Accounts (CoA).
-- It must contain values in the same currency as the accounting currency of the GL.
+- It must be capable of linking to your date table
+- It must be capable of linking to the Chart of Accounts (CoA)
+- It must contain values in the same currency as the accounting currency of the GL
 
 The first point to note is that we don't want to join our budgets directly to individual GL transactions, so we use the Date and the Chart of Account tables to bridge them and allow us to show budgets against transaction totals for the relevant GL account.
 
-The simplest scenario is a budget value per account, per month.
+The simplest scenario is a budget value per account, per month:
 
 ![Figure 7.1 - An example budget spreadsheet](ch_assets/page_180.png)
 
@@ -54,8 +61,7 @@ The simplest scenario is a budget value per account, per month.
    Note: human-friendly but not Power-BI friendly (must be unpivoted)
 ```
 
-
-We're going to use our budget spreadsheet for the examples in this chapter, and the first step is to load the data into our Power BI file. On loading, the first thing we note is that the column headers have not been recognized. This is often the case when Excel has treated headers as dates - you can see `Column 1`, `Column 2`, and so on as header names, with the actual header names in the first row (see Figure 7.2).
+We're going to use our budget spreadsheet for the examples in this chapter, and the first step is to load the data into our Power BI file. On loading, the first thing we note is that the column headers have not been recognized. This is often the case when Excel has treated headers as dates, as you can see in Figure 7.2. Here, you can see `Column 1`, `Column 2`, and so on as header names and the actual header names in the first row.
 
 ![Figure 7.2 - Use First Row as Headers](ch_assets/page_180.png)
 
@@ -74,12 +80,11 @@ We're going to use our budget spreadsheet for the examples in this chapter, and 
    Action: Home -> Transform -> Use First Row as Headers
 ```
 
-
-After you click **Use First Row as Headers**, Power Query promotes the values in the first row to the headers, so that's fixed.
+After you click **Use First Row as Headers**, you'll see that Power Query promotes the values in the first row to the headers, so that's fixed.
 
 As discussed in *Chapter 6, Streamlining with Power Query*, we select the date columns with budget values and choose **Unpivot Only Selected Columns** from the right-click menu. We then rename the two columns that Power Query names, `Attribute` and `Value`, to `Month` and `Amount` so that the names reflect the values within the rows. We do this by double-clicking the column header and typing in the new names.
 
-Now, we can create a `Date` column from the period number and the financial year (see Figure 7.3).
+Now, we can create a `Date` column from the period number and the financial year:
 
 ![Figure 7.3 - Creating a Date column](ch_assets/page_181.png)
 
@@ -99,74 +104,60 @@ Now, we can create a `Date` column from the period number and the financial year
        Date = #date( [Year], [MonthNo], 1 )
 ```
 
-
-The final step is to transform the `Date` column to be formatted as a date and the `Amount` column to be formatted as a currency. We do this by clicking the column-type icon to the left of the column names (see Figure 7.4).
+The final step is to transform the `Date` column to be formatted as a date and the `Amount` column to be formatted as a currency. We can do this by clicking the column type icon to the left of the column names.
 
 ![Figure 7.4 - Unpivoting the budget data](ch_assets/page_181.png)
 
 ```
-   Unpivot: wide matrix -> tall table (Power-BI friendly)
+   Power Query Editor - Unpivot Only Selected Columns
 
-   WIDE (before)                       TALL (after unpivot)
-   +--------+------+------+            +--------+-------+--------+
-   |Account | Jan  | Feb  |            |Account | Month | Amount |
-   +--------+------+------+            +--------+-------+--------+
-   | 4000   |50000 |52000 |    -->     | 4000   | Jan   | 50000  |
-   | 5000   |20000 |21000 |            | 4000   | Feb   | 52000  |
-   +--------+------+------+            | 5000   | Jan   | 20000  |
-                                       | 5000   | Feb   | 21000  |
-                                       +--------+-------+--------+
-   Right-click month columns -> Unpivot Other Columns
-   Rename Attribute -> Month,  Value -> Amount
+   BEFORE  (matrix form)                 AFTER  (unpivoted form)
+   +--------+------+------+------+      +--------+-------+-------+
+   |Account | Jan  | Feb  | Mar  |      |Account |Month  |Amount |
+   +--------+------+------+------+      +--------+-------+-------+
+   | 4000   |50000 |52000 |55000 |      | 4000   | Jan   | 50000 |
+   | 5000   |20000 |21000 |22000 |      | 4000   | Feb   | 52000 |
+   | 6000   |30000 |30000 |30000 |      | 4000   | Mar   | 55000 |
+   +--------+------+------+------+      | 5000   | Jan   | 20000 |
+                                         | 5000   | Feb   | 21000 |
+   Select Jan, Feb, Mar columns,         | ...    | ...   | ...   |
+   right-click, choose                   +--------+-------+-------+
+     -> Unpivot Other Columns            (renamed to Month and Amount)
+
+   This flat shape is exactly what Power BI wants for the Budget table.
 ```
 
+You'll notice that all budget dates are on the first day of the month. We did this deliberately so that we can utilize the benefits of Power BI's time intelligence (TI) functions to make the exercise quicker, as we'll aggregate budgets and actuals by month and year. If Power BI recognizes a full date, it'll make TI functions available. We'll explain this in more detail later.
 
-You'll notice that all budget dates are on the first day of the month. We did this deliberately so that we can utilize the benefits of Power BI's time-intelligence (TI) functions to make the exercise quicker, as we'll aggregate budgets and actuals by month and year. If Power BI recognizes a full date, it will make TI functions available. We'll explain this in more detail later.
-
-Once we've done the transformation, it's time to include this in our data model, first by clicking **Close & Apply** in Power Query. We then join the Chart of Accounts and Calendar tables to the Budget table by linking the `Date` and `AccountNumber` fields. We made this easier for ourselves in the **Data Model** view by creating a new tab to only see the tables we're working with (see Figure 7.5).
+Once we've done the transformation, it's time to include this in our data model, first by clicking **Close & Apply** in Power Query. We then join the Chart of Accounts and Calendar tables to the Budget table by linking the `Date` and `AccountNumber` fields. We made this easier for ourselves in the Data Model view by creating a new tab to only see the tables we're working with:
 
 ![Figure 7.5 - Budget data model](ch_assets/page_182.png)
 
 ```
-   Data Model - relationships around the Budget table
+   Power BI Data Model - Budget joined to the existing star schema
 
-        +---------------+           +----------------+
-        |   Calendar    | 1     N * |     Budget     |
-        |---------------|-----------|----------------|
-        | Full Date (PK)|           | Date        FK |
-        | Calendar Year |           | AccountNumber FK|
-        | Calendar Month|           | Amount         |
-        | Month and Year|           | Month and Year |
-        +---------------+           +----------------+
-                                              |
-                                              | N
-                                              v
-                                       +----------------+
-                                       | Chart of       |
-                                       | Accounts (CoA) |
-                                       |----------------|
-                                       | AccountNumber  |
-                                       |   (PK)         |
-                                       | AccountName    |
-                                       | LinkID         |
-                                       +----------------+
-                                              |
-                                              | N
-                                              v
-                                       +----------------+
-                                       | GL Transactions|
-                                       |----------------|
-                                       | TransID        |
-                                       | Date        FK |
-                                       | LinkID      FK |
-                                       | Amount         |
-                                       +----------------+
+   +----------------+         +-------------------+         +----------------+
+   |  Calendar      |         |     Budget        |         | Chart of       |
+   |  (Date)        |         |  (Date,           |         | Accounts       |
+   |                | 1     * |   AccountNumber,  | *     1 | (AccountNumber)|
+   |  FullDate -----+---------+-- Date            +---------+-- AccountNumber|
+   |  Month / Yr    |         |   Amount          |         |  AccountName   |
+   |  FiscalYr      |         |   Month and Year  |         |  AccountCat    |
+   +----------------+         |   Days in Month   |         |  LinkID        |
+                              |   Daily Amount    |         +----------------+
+                              +-------------------+
+                                          |
+                                          | * (the Budget table also relates
+                                          v    to GL Transactions via the
+                              +-------------------+     Calendar/CoA bridge)
+                              |  GL Transactions  |
+                              |  (TransactionID)  |
+                              |  Date, AccountNum |
+                              |  Amount, etc.     |
+                              +-------------------+
 ```
 
-
 We now have the basic data imported, so we're ready to start looking at how we are going to use it. The first step will be to deal with budget data stored by months and transactions stored daily.
-
----
 
 ## 7.3 Handling differences in granularity
 
@@ -204,33 +195,35 @@ Figure 7.6 shows our example, and we have listed all the steps following this:
    Power BI Matrix visual: Month budget report
 
    Rows:  AccountNumber, AccountName, AccountCategoryDescription
-   Cols:  Calendar Year, Calendar Month
+   Cols:  Calendar Year Name, Calendar Month Name
    Values: GL Amount | Budget Amount | Budget Variance
 
-   +-----------+----------------+----------+--------+--------+----------+
-   | Account#  | Account Name   | 2024 Apr | 2024 May| 2025 Apr| 2025 May |
-   +-----------+----------------+----------+--------+--------+----------+
-   | 4000      | Sales          |  58000   |  60000 |  62000 |  65000   |
-   | 5000      | COGS           |  23000   |  24000 |  25000 |  26000   |
-   | 6000      | Salaries       |  30000   |  30000 |  32000 |  32000   |
-   +-----------+----------------+----------+--------+--------+----------+
+   +-----------+----------------+----------+--------+----------+--------+
+   | Account#  | Account Name   | 2024 Apr | 2024 May| 2025 Apr | 2025 May|
+   +-----------+----------------+----------+--------+----------+--------+
+   | 4000      | Sales          |  58000   |  60000 |  62000   |  65000  |
+   | 5000      | COGS           |  23000   |  24000 |  25000   |  26000  |
+   | 6000      | Salaries       |  30000   |  30000 |  32000   |  32000  |
+   +-----------+----------------+----------+--------+----------+--------+
    Conditional formatting on Budget Variance: red below 0, green above 0
 ```
-
 
 Here are the detailed steps:
 
 1. We started with a **Matrix** visual that has the following rows:
-   - `AccountNumber` from the Chart of Account table.
-   - `AccountName` from the Chart of Account table.
-   - `AccountCategoryDescription` from the Chart of Account table.
+
+   - `AccountNumber` from the Chart of Account table
+   - `AccountName` from the Chart of Account table
+   - `AccountCategoryDescription` from the Chart of Account table
 2. Our columns are as follows:
-   - `Calendar Year Name`.
-   - `Calendar Month Name`.
+
+   - `Calendar Year Name`
+   - `Calendar Month Name`
 3. Our values are as follows:
-   - `GL Amount`.
-   - `Budget Amount`.
-   - `Budget Variance`.
+
+   - `GL Amount`
+   - `Budget Amount`
+   - `Budget Variance`
 4. We filtered the calendar years 2024 and 2025.
 5. From the **Format** options, we chose the **Tabular Layout** option from the Layout and Style presets.
 6. We then right-clicked one of the `AccountNumber` rows in the visual and chose **Expand | All** to show all levels.
@@ -257,7 +250,6 @@ Here are the detailed steps:
    +---------------------------------------------------+
 ```
 
-
 9. We also added icon-based conditional formatting to the same field, as shown in Figure 7.8.
 
 ![Figure 7.8 - Budget Variance icons](ch_assets/page_185.png)
@@ -278,7 +270,6 @@ Here are the detailed steps:
    |  [Apply]   [Cancel]                               |
    +---------------------------------------------------+
 ```
-
 
 How you format and calculate variances for monthly budgeting is an organizational preference, so please experiment with the steps we've provided and find formats and styles that work for you. The most important part of the monthly budgeting exercise was to build a model that makes reporting on budgeting variances fast and accurate.
 
@@ -354,7 +345,6 @@ Daily Amount = DIVIDE(Budget[Amount], Budget[Days in Month])
    Daily Amount  =  DIVIDE( Budget[Amount], Budget[DaysInMo] )
 ```
 
-
 Figure 7.9 shows a view of how your `Budget` table should look with the additional fields.
 
 **5.** The next step is to create a daily budget table through a `CROSSJOIN` operation of the Calendar table and the Budget table. As the Calendar table has a row for each day of the year, it provides the basis to populate a new table with daily budget values. To build this table, we go to **Modeling | New Table** when in the Report view, or **Home | New Table** from the Table view.
@@ -397,12 +387,9 @@ The resulting table will look like Figure 7.10:
    Built via FILTER( CROSSJOIN( Calendar, Budget ), ... )
 ```
 
-
 This can be joined into our model, joining the Calendar `Full Date` values to the `Full Date` values of the Calendar table and the `TransLink` values to the `LinkID` values of the Chart of Account table.
 
 In the next section, we'll continue our development of budget models by looking at drill-through.
-
----
 
 ## 7.4 Seeing the details with drill-through
 
@@ -445,7 +432,6 @@ The table will provide the data that's returned from the drill-through, but we n
      Drill-through on:  List of Measures[GL Amount]
 ```
 
-
 You'll also notice that when you add the `GL Amount` field to enable the drill-through, Power BI adds a back-arrow icon to the top-left of the screen. This is a UI element for the user to return to the original report when they've viewed the drill-through data.
 
 If you return to the Budget page and right-click any of the `GL Amount` values, you'll see a **Drill through** option in the right-click menu. Hover over **Drill through**, and you'll see **Budget Drillthrough** appear, indicating that the action will take you to the `Drill through` tab (see Figure 7.12).
@@ -467,7 +453,6 @@ If you return to the Budget page and right-click any of the `GL Amount` values, 
    Selecting "Budget Drillthrough" navigates to the drill-through page
 ```
 
-
 When you click **Drill through**, you'll be taken to the `Drill through` tab, which will be filtered according to the state of the Budget table. You can't see from Figure 7.12 that the value we right-clicked was **$216,629.21**. The drill-through action took us to Figure 7.13:
 
 ![Figure 7.13 - Drill-through complete](ch_assets/page_191.png)
@@ -486,7 +471,6 @@ When you click **Drill through**, you'll be taken to the `Drill through` tab, wh
                                                 +--------------------------------+
    Top-left "back arrow" returns to the Budget page
 ```
-
 
 You'll notice that drill-through filters are displayed on the right-hand side of the screen (see Figure 7.14), where you will be able to change them - an action that can be useful when investigating the data.
 
@@ -510,12 +494,9 @@ You'll notice that drill-through filters are displayed on the right-hand side of
    Users can change the drill-through filter values to investigate other slices
 ```
 
-
 To return to the Budget screen (or the source of the drill-through), click the back-arrow icon in the top-left of the screen. Please note that you can move the back-arrow icon anywhere on the screen.
 
 Drill-through is very common for financial and transactional reporting. Most users, when seeing a variance or an issue, will want to view the underlying transactions; drill-through enables this. It has the benefit of being quick to set up, and you can incorporate many drill-throughs against a dataset for different scenarios.
-
----
 
 ## 7.5 Visuals to consider for analyzing budgets
 
@@ -546,7 +527,6 @@ We used a matrix and drill-through for our examples, which is often the default 
        Legend:  [##] GL Amount  [##] Budget Amount
 ```
 
-
 - The **Gauge** visual shows an effective high-level view of differences through a classic speedometer style, showing how the budget compares to the actuals or vice versa. The Gauge visual is effectively used in dashboards where users want to see performance at a glance (see Figure 7.16).
 
 ![Figure 7.16 - Budget as a gauge](ch_assets/page_193.png)
@@ -576,7 +556,6 @@ We used a matrix and drill-through for our examples, which is often the default 
    Use: at-a-glance view on dashboard KPIs
 ```
 
-
 - The **New Card** visual (still `Card (new)` in the UI at the time of writing) has great methods to show comparisons of values at a high level. Like the Gauge visual, the New Card visual is effective for at-a-glance dashboards (see Figure 7.17).
 
 ![Figure 7.17 - Budget as a card](ch_assets/page_193.png)
@@ -600,7 +579,6 @@ We used a matrix and drill-through for our examples, which is often the default 
    "New Card" supports comparison-callout style formatting
 ```
 
-
 - Less used for financial budgets, but still worth consideration, is the **Waterfall Chart** visual, which shows a step-by-step view of positive and negative variances (see Figure 7.18).
 
 ![Figure 7.18 - Budget as a waterfall](ch_assets/page_194.png)
@@ -619,12 +597,9 @@ We used a matrix and drill-through for our examples, which is often the default 
    Step-by-step view: positive (green) / negative (red) variances
 ```
 
-
 We encourage you to experiment and work with your users on the best visuals for your budgeting needs. There is no right or wrong answer to most areas of analytics; whatever best serves your users or business case should be the visual you use. As we mentioned, we chose the Matrix visual with conditional formatting for this chapter as it's the visual we most often deploy, but as you can see from the preceding content, there are many options.
 
 For many organizations, this is everything required for budgeting. However, in some cases, there's a need for a more complex model that includes different scenarios or models. We cover this advanced topic in the final section of this chapter.
-
----
 
 ## 7.6 Working with multiple budget models or scenarios
 
@@ -650,7 +625,7 @@ If your budget files are in a common SharePoint folder (which can include sub-fo
 
 If your files are in many locations but you can access them from Power BI, you can use the **Append** feature in Power Query to incorporate the separate files into a single table. Similar to what was mentioned in the preceding paragraph, it's a good idea to add a reference to each file so that you can classify them later. This may include the year, organization, and revision, and will be useful for slicing the data when comparing budgets.
 
-As budgets are live and being changed frequently, you'll be able to refresh the data with any changes. As time rolls by, it's advisable to think about long-term storage of those spreadsheets beyond Excel, such as a Dataflow, Dataverse, or a SQL database.
+As budgets are live and being changed frequently, you'll be able to refresh the data with any changes. As time rolls on, it's advisable to think about long-term storage of those spreadsheets beyond Excel, such as a Dataflow, Dataverse, or a SQL database.
 
 ### 7.6.3 Managing multiple budgeting methods
 
@@ -692,14 +667,8 @@ The key to managing multiple budgets is clear organization. The calculations are
 
 In this section, we discussed the potential complexity of dealing with multiple budgets. We started by discussing the need for a consistent data structure as a foundation for success. Then, we moved on to incorporating and managing multiple methods and revisions, and how to stay on top of the process of budgeting. With some careful organization and planning, the process is manageable, and Power BI will deliver some excellent analysis for your users.
 
----
-
 ## 7.7 Summary
 
 This chapter covered budgets and how you can incorporate and interrogate budgets into your data. Along the way, we also introduced some new functions in calculated tables and drill-through, both of which we're sure you'll find immensely useful across many of your Power BI reports. We ended the chapter by considering some of the options you may like to consider for visually displaying budget-to-actual variances.
 
 In the next chapter, we turn our attention to another applied finance topic, which is inventory.
-
----
-
-_Generated by `convert_chapter7.py` + `build_md.py` on 2026-06-16._

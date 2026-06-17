@@ -1,0 +1,29 @@
+{
+  "chapter_num": 12,
+  "chapter_title": "Financial Reporting in an AI-Driven World",
+  "start_page": 294,
+  "end_page": 319,
+  "figures": {
+    "12.1": 299,
+    "12.2": 300,
+    "12.3": 301,
+    "12.4": 302,
+    "12.5": 303,
+    "12.6": 304,
+    "12.7": 305,
+    "12.8": 306,
+    "12.9": 310
+  },
+  "figures_caption": {
+    "12.1": "Workspace settings",
+    "12.2": "Prep data for AI",
+    "12.3": "Simplify the data schema",
+    "12.4": "Figure 12.4: Setting up a verified answer",
+    "12.5": "Setting up Verified answers",
+    "12.6": "Add AI instructions",
+    "12.7": "Prompting on PROPEXP",
+    "12.8": "Further prompting",
+    "12.9": "The level of data maturity"
+  },
+  "tables_caption": {}
+}

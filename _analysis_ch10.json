@@ -1,0 +1,17 @@
+{
+  "chapter_num": 10,
+  "chapter_title": "Testing and Fine-Tuning Your Data",
+  "start_page": 262,
+  "end_page": 275,
+  "figures": {
+    "10.1": 268,
+    "10.2": 269,
+    "10.3": 270
+  },
+  "figures_caption": {
+    "10.1": "– Table showing transactions",
+    "10.2": "– Dropdown of column settings and options",
+    "10.3": "– Dropdown of options from the table visual"
+  },
+  "tables_caption": {}
+}
